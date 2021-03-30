@@ -1,11 +1,13 @@
 const router = require("express").Router();
 
-const Workout = require("../models");
+const db = require("../models");
 
 module.exports = function (app) {
+
+  //GET request to get all workouts daat
   app.get("/api/workouts", function (req, res) {
     console.log("getting workouts");
-    Workout.find()
+    db.Workout.find()
       .then((data) => {
         console.log(data);
         res.json(data);
@@ -15,35 +17,47 @@ module.exports = function (app) {
       });
   });
 
-  // POST request to save workout exercise
-  app.post("/api/workouts", function (req, res) {
-    console.log("posting workouts " + req.body);
-    Workout.create({})
-      .then((data) => res.json(data))
-      .catch((err) => {
-        console.log("err", err);
+  //GET last workout limit to 7
+  app.get("/api/workouts/", (req, res) => {
+    db.Workout.aggregate([
+      {
+        $addFields: {
+          totalDuration: { $sum: "$exercises.duration" }
+        }
+      },
+    ])
+      .then(data => {
+        console.log(data)
+        res.json(data);
+      })
+      .catch(err => {
         res.status(400).json(err);
       });
   });
 
+  // POST request to save workout exercise
+  app.post("/api/workouts", ({ body }, res) => {
+    db.Workout.create(body)
+      .then((data) => {
+        res.json(data);
+      })
+      .catch((err) => {
+        res.status(400).json(err);
+      });
+  });
+
+
+
   // PUT request to update exercise information by id
-   app.put("/api/workouts/:id", (req, res) => {
-    Workout.findByIdAndUpdate({
-            _id: req.params.id
-        }, {
-            $push: {
-                exercises: req.body
-            }
-        })
-        .then((dbWorkout) => {
-            console.log(dbWorkout);
-            res.json(dbWorkout);
-        })
-        .catch((err) => {
-            res.status(400).json(err);
-        });
-});
-  
+  app.put("/api/workouts/:id", ({ body, params }, res) => {
+    db.Fitness.findByIdAndUpdate(params.id, { $push: { exercises: body } })
+      .then((dbData) => {
+        res.json(dbData);
+      })
+      .catch((err) => {
+        res.json(err);
+      });
+  });
   // app.put("/api/workouts/:id", ({ body, params }, res) => {
   //   console.log("getting workouts by id");
   //   Workout.findByIdAndUpdate(
@@ -58,10 +72,10 @@ module.exports = function (app) {
   //     });
   // });
 
-  // GET request to read workout range data from the database
+  // GET request to read workout range data from the database limited to 7
   app.get("/api/workouts/range", (req, res) => {
     console.log("getting workouts data");
-    Workout.aggregate([
+    db.Workout.aggregate([
       {
         $limit: 7,
       },
