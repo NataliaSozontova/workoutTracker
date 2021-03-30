@@ -4,7 +4,7 @@ const db = require("../models");
 
 module.exports = function (app) {
 
-  //GET request to get all workouts daat
+  //GET request to get all workouts data
   app.get("/api/workouts", function (req, res) {
     console.log("getting workouts");
     db.Workout.find()
@@ -58,19 +58,6 @@ module.exports = function (app) {
         res.json(err);
       });
   });
-  // app.put("/api/workouts/:id", ({ body, params }, res) => {
-  //   console.log("getting workouts by id");
-  //   Workout.findByIdAndUpdate(
-  //     params.id,
-  //     { $push: { exercises: body } },
-  //     { new: true, runValidators: true }
-  //   )
-  //     .then((data) => res.json(data))
-  //     .catch((err) => {
-  //       console.log("err", err);
-  //       res.json(err);
-  //     });
-  // });
 
   // GET request to read workout range data from the database limited to 7
   app.get("/api/workouts/range", (req, res) => {
