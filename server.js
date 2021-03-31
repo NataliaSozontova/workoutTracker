@@ -14,10 +14,11 @@ app.use(express.static('public'));
 // app.use(express.static("seeders"));
 
 // Connecting to mongoDB
-var MONGODB_URI = process.env.MONGODB_URI  ||"mongodb://localhost/myFirstDatabase";
-// 'mongodb://SozNatalie:password123@workouttracker.uo6h4.mongodb.net/tracker?retryWrites=true&w=majority'
-console.log("url is " + MONGODB_URI);
-mongoose.connect(MONGODB_URI, {
+// var MONGODB_URI = process.env.MONGODB_URI  ||"mongodb://localhost/myFirstDatabase";
+// // 'mongodb://SozNatalie:password123@workouttracker.uo6h4.mongodb.net/tracker?retryWrites=true&w=majority'
+// console.log("url is " + MONGODB_URI);
+
+mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/workout", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true,
@@ -26,6 +27,10 @@ mongoose.connect(MONGODB_URI, {
     console.log("this is error for mongo => " + error);
 })
 
+mongoose.connection.on('connected', () =>{
+    console.log("Mongoose is connected")
+  });
+  
 // Connecting routes
 require("./routes/api-routes")(app);
 require("./routes/html-routes")(app);
