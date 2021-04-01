@@ -50,7 +50,7 @@ module.exports = function (app) {
 
   // PUT request to update exercise information by id
   app.put("/api/workouts/:id", ({ body, params }, res) => {
-    db.Fitness.findByIdAndUpdate(params.id, { $push: { exercises: body } })
+    db.Workout.findByIdAndUpdate(params.id, { $push: { exercises: body } })
       .then((dbData) => {
         res.json(dbData);
       })
